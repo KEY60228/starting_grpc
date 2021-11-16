@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"local.packages/pancake/maker/gen/api"
+	"pancake/client/gen/api"
 )
 
 var client = getClient()
