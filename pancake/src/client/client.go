@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"pancake/client/gen/api"
 )
 
 var client = getClient()
+var md = metadata.New(map[string]string{"authorization": "bearer hi/mi/tsu"})
 
 func getClient() api.PancakeBakerServiceClient {
 	address := "api:50051"
@@ -25,6 +27,7 @@ func getClient() api.PancakeBakerServiceClient {
 
 func bakePancake(menu api.Pancake_Menu) (*api.BakeResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx = metadata.NewOutgoingContext(ctx, md)
 	defer cancel()
 
 	req := &api.BakeRequest{
@@ -37,6 +40,7 @@ func bakePancake(menu api.Pancake_Menu) (*api.BakeResponse, error) {
 
 func getReport() (*api.ReportResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx = metadata.NewOutgoingContext(ctx, md)
 	defer cancel()
 
 	req := &api.ReportRequest{}
