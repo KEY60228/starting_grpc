@@ -1,0 +1,14 @@
+version: '3'
+services:
+  api:
+    build: ./src/api/
+    volumes:
+      - ./src:/golang
+    ports:
+      - "50051:50051"
+    tty: true
+  client:
+    build: ./src/client/
+    volumes:
+      - ./src:/golang
+    tty: true
