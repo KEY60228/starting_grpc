@@ -164,3 +164,23 @@ func (r *Reversi) send(ctx context.Context, stream pb.GameService_PlayClient) er
 		}
 	}
 }
+
+func (r *Reversi) run() error {
+	etx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	if err != nil {
+		return errors.Wrap(err, "Failed to connect to grpc server")
+	}
+	defer conn.Close()
+
+	// マッチング問い合わせ
+	err = r.matching(ctx, pb.NewMatchingServiceClient(conn))
+	if err != nil {
+		return err
+	}
+
+	// マッチングできたので盤面生成
+	r.game = game.NewGame(r.me.Color)
+}
