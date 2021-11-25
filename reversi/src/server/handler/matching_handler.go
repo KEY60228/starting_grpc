@@ -1,17 +1,22 @@
 package handler
 
 import (
-	"reversi/build"
-	"reversi/game"
-	"reversi/gen/pb"
+	"context"
+	"fmt"
+	"sync"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"reversi/build"
+	"reversi/game"
+	"reversi/gen/pb"
 )
 
 type MatchingHandler struct {
 	sync.RWMutex
-	Rooms map[int32]*game.Room
+	Rooms       map[int32]*game.Room
 	maxPlayerID int32
 }
 
@@ -22,7 +27,7 @@ func NewMatchingHandler() *MatchingHandler {
 }
 
 func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingService_JoinRoomServer) error {
-	ctx, cancel := context.WithTimeout(stream.Context(), 2 * time.Minute)
+	ctx, cancel := context.WithTimeout(stream.Context(), 2*time.Minute)
 	defer cancel()
 
 	h.Lock()
@@ -40,8 +45,8 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 			room.Guest = me
 			stream.Send(&pb.JoinRoomResponse{
 				Status: pb.JoinRoomResponse_MATCHED,
-				Room: build.PBRoom(room),
-				Me: build.PBPlayer(room.Guest),
+				Room:   build.PBRoom(room),
+				Me:     build.PBPlayer(room.Guest),
 			})
 			h.Unlock()
 			fmt.Printf("matched room_id = %v\n", room.ID)
@@ -52,7 +57,7 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 	// 空いている部屋がない場合、部屋を作る
 	me.Color = game.Black
 	room := &game.Room{
-		ID: int32(len(h.Rooms)) + 1,
+		ID:   int32(len(h.Rooms)) + 1,
 		Host: me,
 	}
 	h.Rooms[room.ID] = room
@@ -60,7 +65,7 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 
 	stream.Send(&pb.JoinRoomResponse{
 		Status: pb.JoinRoomResponse_WAITING,
-		Room: build.PBRoom(room),
+		Room:   build.PBRoom(room),
 	})
 
 	ch := make(chan int)
@@ -69,12 +74,12 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 			h.RLock()
 			guest := room.Guest
 			h.RUnlock()
-			
+
 			if guest != nil {
 				stream.Send(&pb.JoinRoomResponse{
 					Status: pb.JoinRoomResponse_MATCHED,
-					Room: build.PBRoom(room),
-					Me: build.PBPlayer(room.Host),
+					Room:   build.PBRoom(room),
+					Me:     build.PBPlayer(room.Host),
 				})
 				ch <- 0
 				break
@@ -83,7 +88,7 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 
 			select {
 			case <-ctx.Done():
-				return 
+				return
 			default:
 			}
 		}

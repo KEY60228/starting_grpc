@@ -11,13 +11,13 @@ import (
 
 type GameHandler struct {
 	sync.RWMutex
-	games map[int32]*game.Game // ゲーム情報(盤面など)を格納する
+	games  map[int32]*game.Game                  // ゲーム情報(盤面など)を格納する
 	client map[int32][]pb.GameService_PlayServer // 状態変更時にクライアントにストリーミングを返すために格納する
 }
 
 func NewGameHandler() *GameHandler {
 	return &GameHandler{
-		games: make(map[int32]*game.Game),
+		games:  make(map[int32]*game.Game),
 		client: make(map[int32][]pb.GameService_PlayServer),
 	}
 }
@@ -85,7 +85,7 @@ func (h *GameHandler) start(stream pb.GameService_PlayServer, roomID int32, me *
 		fmt.Printf("game has started room_id = %v\n", roomID)
 	} else {
 		// まだ揃っていないので、待機中であることをクライアントに通知する
-		err := stream.Send(&pb.PlayResponse {
+		err := stream.Send(&pb.PlayResponse{
 			Event: &pb.PalyResponse_Waiting{
 				Waiting: &pb.PlayResponse_WaitingEvent{},
 			},
@@ -95,7 +95,7 @@ func (h *GameHandler) start(stream pb.GameService_PlayServer, roomID int32, me *
 		}
 	}
 
-	return nil;
+	return nil
 }
 
 func (h *GameHandler) move(roomID int32, x int32, y int32, p *game.Player) error {
@@ -133,7 +133,7 @@ func (h *GameHandler) move(roomID int32, x int32, y int32, p *game.Player) error
 				Event: &pb.PlayResponse_Finished{
 					Finished: &pb.PlayResponse_FinishedEvent{
 						Winner: build.PBColor(g.Winner()),
-						Board: build.PBBoard(g.Board()),
+						Board:  build.PBBoard(g.Board()),
 					},
 				},
 			})
