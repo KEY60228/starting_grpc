@@ -86,7 +86,7 @@ func (h *GameHandler) start(stream pb.GameService_PlayServer, roomID int32, me *
 	} else {
 		// まだ揃っていないので、待機中であることをクライアントに通知する
 		err := stream.Send(&pb.PlayResponse{
-			Event: &pb.PalyResponse_Waiting{
+			Event: &pb.PlayResponse_Waiting{
 				Waiting: &pb.PlayResponse_WaitingEvent{},
 			},
 		})
@@ -112,7 +112,7 @@ func (h *GameHandler) move(roomID int32, x int32, y int32, p *game.Player) error
 	for _, s := range h.client[roomID] {
 		// 手が打たれたことをクライアントに通知する
 		err := s.Send(&pb.PlayResponse{
-			Event: &pb.PlayResponse_MoveEvent{
+			Event: &pb.PlayResponse_Move{
 				Move: &pb.PlayResponse_MoveEvent{
 					Player: build.PBPlayer(p),
 					Move: &pb.Move{
@@ -133,7 +133,7 @@ func (h *GameHandler) move(roomID int32, x int32, y int32, p *game.Player) error
 				Event: &pb.PlayResponse_Finished{
 					Finished: &pb.PlayResponse_FinishedEvent{
 						Winner: build.PBColor(g.Winner()),
-						Board:  build.PBBoard(g.Board()),
+						Board:  build.PBBoard(g.Board),
 					},
 				},
 			})

@@ -25,7 +25,7 @@ func PBPlayer(p *game.Player) *pb.Player {
 
 func PBColor(c game.Color) pb.Color {
 	switch c {
-	case game.Block:
+	case game.Black:
 		return pb.Color_BLACK
 	case game.White:
 		return pb.Color_WHITE

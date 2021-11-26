@@ -14,7 +14,7 @@ func ColorToStr(c Color) string {
 	switch c {
 	case Black:
 		return "○"
-	case Whie:
+	case White:
 		return "◉"
 	case Empty:
 		return " "

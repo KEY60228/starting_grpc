@@ -21,7 +21,7 @@ type MatchingHandler struct {
 }
 
 func NewMatchingHandler() *MatchingHandler {
-	return &MathcingHandler{
+	return &MatchingHandler{
 		Rooms: make(map[int32]*game.Room),
 	}
 }
@@ -33,7 +33,7 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 	h.Lock()
 
 	// プレイヤーの新規作成
-	h.MaxPlayerID++
+	h.maxPlayerID++
 	me := &game.Player{
 		ID: h.maxPlayerID,
 	}
@@ -97,7 +97,7 @@ func (h *MatchingHandler) JoinRoom(req *pb.JoinRoomRequest, stream pb.MatchingSe
 	select {
 	case <-ch:
 	case <-ctx.Done():
-		return status.Errorf(codes.DeadlinExceeded, "マッチングできませんでした")
+		return status.Errorf(codes.DeadlineExceeded, "マッチングできませんでした")
 	}
 
 	return nil

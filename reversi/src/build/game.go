@@ -8,7 +8,7 @@ import (
 )
 
 func Room(r *pb.Room) *game.Room {
-	return *game.Room{
+	return &game.Room{
 		ID:    r.GetId(),
 		Host:  Player(r.GetHost()),
 		Guest: Player(r.GetGuest()),
@@ -31,7 +31,7 @@ func Color(c pb.Color) game.Color {
 	case pb.Color_EMPTY:
 		return game.Empty
 	case pb.Color_WALL:
-		return game.WALL
+		return game.Wall
 	}
 
 	panic(fmt.Sprintf("unknown color = %v", c))
