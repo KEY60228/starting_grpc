@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -27,7 +28,7 @@ type Reversi struct {
 }
 
 func NewReversi() *Reversi {
-	return *Reversi{}
+	return &Reversi{}
 }
 
 func (r *Reversi) Run() int {
@@ -58,7 +59,7 @@ func (r *Reversi) matching(ctx context.Context, cli pb.MatchingServiceClient) er
 		if resp.GetStatus() == pb.JoinRoomResponse_MATCHED {
 			// マッチング成立
 			r.room = build.Room(resp.GetRoom())
-			r.me = bulid.Player(resp.GetMe())
+			r.me = build.Player(resp.GetMe())
 			fmt.Printf("Matched room_id = %d\n", resp.GetRoom().GetId())
 			return nil
 		} else if resp.GetStatus() == pb.JoinRoomResponse_WAITING {
@@ -251,7 +252,7 @@ func (r *Reversi) send(ctx context.Context, stream pb.GameService_PlayClient) er
 }
 
 func (r *Reversi) run() error {
-	etx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
@@ -289,7 +290,7 @@ func parseInput(txt string) (int32, int32, error) {
 	}
 
 	ys := ss[1]
-	y, err := strconv.PartInt(ys, 10, 32)
+	y, err := strconv.ParseInt(ys, 10, 32)
 	if err != nil {
 		return 0, 0, fmt.Errorf("入力が不正です ex.) A-1")
 	}

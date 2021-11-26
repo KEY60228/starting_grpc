@@ -66,7 +66,7 @@ func (g *Game) Winner() Color {
 func (g *Game) Display(me Color) {
 	fmt.Println("")
 	if me != None {
-		fmt.Println("You: %v\n", ColorToStr(me))
+		fmt.Printf("You: %v\n", ColorToStr(me))
 	}
 
 	fmt.Print(" |")
